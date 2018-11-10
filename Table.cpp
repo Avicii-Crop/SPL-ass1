@@ -55,7 +55,7 @@ void Table::order(const std::vector<Dish> &menu){
     while(it!=customersList.end()){
         c_type=(*it)->getName().substr((*it)->getName().length()-3,3);
         c_name=(*it)->getName().substr(0,(*it)->getName().length()-4);
-        if
+        if(c_type=="veg"){}
 
     }
 
