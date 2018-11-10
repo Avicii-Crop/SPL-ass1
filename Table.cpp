@@ -49,7 +49,15 @@ void Table::openTable(){open=true;}
 bool Table::isOpen(){return open;}
 
 void Table::order(const std::vector<Dish> &menu){
-    
+    std::vector<Customer*>::iterator it=customersList.begin();
+    std::string c_type;
+    std::string c_name;
+    while(it!=customersList.end()){
+        c_type=(*it)->getName().substr((*it)->getName().length()-3,3);
+        c_name=(*it)->getName().substr(0,(*it)->getName().length()-4);
+        if
+
+    }
 
 }
 
