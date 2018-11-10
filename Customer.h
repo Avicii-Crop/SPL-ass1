@@ -12,11 +12,10 @@ public:
     virtual std::string toString() const = 0;
     std::string getName() const;
     int getId() const;
+    std::string getType() const;
 private:
     const std::string name;
     const int id;
-protected:
-    std::vector<int> orders;
 };
 
 
@@ -35,6 +34,7 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
 private:
+    bool ordered;
 };
 
 
@@ -44,6 +44,8 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
 private:
+    int orderCount;
+    int bvgId;
 };
 
 
@@ -53,8 +55,10 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     inline void sortALC(const std::vector<Dish> &menu);
     std::string toString() const;
+
 private:
     std::vector<int> sortedALC;
+    int orderCount;
 };
 
 
