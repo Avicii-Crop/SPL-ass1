@@ -22,6 +22,12 @@ public:
     void closeTable();
     int getBill();
     bool isOpen();
+    virtual void ~Table();
+    virtual Table(Table& table);
+    Table& operator=(const Table& other);
+    Table(Table&& other);
+    void steal(Table& other);
+    Table& operator=(Table&& other);
 private:
     int capacity;
     bool open;

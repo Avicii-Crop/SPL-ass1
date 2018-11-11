@@ -78,3 +78,50 @@ int Table::getBill(){
         output+=orderList[i].second.getPrice();
     return output;
 }
+
+//Destructor
+virtual void Table:: ~Table(){
+   // std::vector<Customers*>::iterator it=customersList.begin();
+    for(int i=0;i<orderList.size();i++){
+        delete orderList(i);
+    }
+    for(int i=0;i<customersList.size();i++){
+        delete customersList(i);   //NOT SURE ABOUT THE ORDER OF THE DELETE COMMANDS
+        customersList(i)= nullptr;
+    }
+
+}
+
+//CopyConstructor
+virtual Table::Table(const Table& table):capacity(table.getCapacity(),open(table.isOpen(),orderList(table))){}
+
+//copy assignment operator
+Table& Table::operator=(const Table& other){
+    this->capacity=other.getCapacity();
+    this->open=other.isOpen();
+    this->customersList=other.getCustomers();
+    this->orderList=other.getOrders();
+
+}
+
+//MoveConstructor
+Table Table::Table(Table&& other){
+    steal(other);
+
+}
+
+void Table::steal(Table &other) {
+    this->open=other.isOpen();
+    this->capacity=other.getCapacity();
+    this->orderList=other.getOrders();
+    this->customersList=other.getCustomers();
+    other= nullptr;
+
+}
+
+//MoveAssignmentOperator
+Table& Table::operator=(Table&& other){
+    delete ();
+    steal(other);
+    return *this;
+}
