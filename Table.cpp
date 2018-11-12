@@ -80,48 +80,47 @@ int Table::getBill(){
 }
 
 //Destructor
-virtual void Table:: ~Table(){
+ Table:: ~Table(){
    // std::vector<Customers*>::iterator it=customersList.begin();
-    for(int i=0;i<orderList.size();i++){
-        delete orderList(i);
-    }
-    for(int i=0;i<customersList.size();i++){
-        delete customersList(i);   //NOT SURE ABOUT THE ORDER OF THE DELETE COMMANDS
-        customersList(i)= nullptr;
-    }
-
+    for(int i=0;i<customersList.size();i++)                   //There is no need to delete a vector of objects
+        delete customersList[i];                                // In case of pointers we have to delete each pointer
+    customersList.clear();                                     //After deleting each pointer we need to delete the vector itself
 }
 
 //CopyConstructor
-virtual Table::Table(const Table& table):capacity(table.getCapacity(),open(table.isOpen(),orderList(table))){}
-
-//copy assignment operator
-Table& Table::operator=(const Table& other){
-    this->capacity=other.getCapacity();
-    this->open=other.isOpen();
-    this->customersList=other.getCustomers();
-    this->orderList=other.getOrders();
+Table::Table(const Table& table):capacity(table.getCapacity()),orderList(table.orderList),open(table.open){
+    for(int i=0;i<table.customersList.size();i++)
+        this->customersList[i]=table.customersList[i];
 
 }
-
+//copy assignment operator
+Table& Table::operator=(const Table& other) {   //IF we change the argument of the function (table& other) to non const then
+    if(this==&other)
+        return *this;
+    delete this;        //MOST CHECK HOW EXACTLY SHOULD WE DELETE 'THIS' BEFORE ASSIGN OTHER INTO IT
+    this->capacity = other.getCapacity();
+    open = other.open;                        //Deleted the 'this' before open
+    this->orderList = other.orderList;
+    for (int i = 0; i < other.customersList.size(); i++)
+        this->customersList[i] = other.customersList[i];
+}
 //MoveConstructor
-Table Table::Table(Table&& other){
+Table::Table(Table&& other){
     steal(other);
 
 }
 
-void Table::steal(Table &other) {
+void Table::steal(Table& other) {
     this->open=other.isOpen();
     this->capacity=other.getCapacity();
     this->orderList=other.getOrders();
     this->customersList=other.getCustomers();
-    other= nullptr;
-
+    other=0;                        //Nullptr DIDNT work so i changed it to 0
 }
 
 //MoveAssignmentOperator
 Table& Table::operator=(Table&& other){
-    delete ();
+    delete this;
     steal(other);
     return *this;
 }
