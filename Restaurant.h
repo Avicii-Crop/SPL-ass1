@@ -20,6 +20,7 @@ public:
     std::vector<Dish>& getMenu();
 
 private:
+    void initTable(int numOfTables,std::string str);
     bool open;
     std::vector<Table*> tables;
     std::vector<Dish> menu;
