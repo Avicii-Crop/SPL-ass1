@@ -16,7 +16,7 @@ int Table::getCapacity() const {return this->capacity;}
 
 void Table::addCustomer(Customer* customer){customersList.push_back(customer);}
 
-void Table::removeCustomer(int id) {
+void Table::removeCustomer(int id) {/*
 
     std::vector<Customer*>::iterator it=customersList.begin();
     bool found= false;                          //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -35,7 +35,7 @@ void Table::removeCustomer(int id) {
             if((*orderIt).first==id)
                 orderList.erase(orderIt);
         }
-    }
+    }*/
 }
 
 Customer* Table::getCustomer(int id) {  //if the id is not in the table return nullptr.
@@ -94,15 +94,16 @@ Table::Table(const Table& table):capacity(table.getCapacity()),orderList(table.o
 
 }
 //copy assignment operator
-Table& Table::operator=(const Table& other) {   //IF we change the argument of the function (table& other) to non const then
+Table& Table::operator=(const Table& other) {
     if(this==&other)
         return *this;
-    delete this;        //MOST CHECK HOW EXACTLY SHOULD WE DELETE 'THIS' BEFORE ASSIGN OTHER INTO IT
+   // delete this;        //MOST CHECK HOW EXACTLY SHOULD WE DELETE 'THIS' BEFORE ASSIGN OTHER INTO IT
     this->capacity = other.getCapacity();
     open = other.open;                        //Deleted the 'this' before open
-    this->orderList = other.orderList;
+    for (int i = 0; i < other.orderList.size(); i++)
+        this->orderList.push_back(other.orderList[i]);
     for (int i = 0; i < other.customersList.size(); i++)
-        this->customersList[i] = other.customersList[i];
+        this->customersList.push_back(other.customersList[i]);
 }
 //MoveConstructor
 Table::Table(Table&& other){
@@ -113,14 +114,18 @@ Table::Table(Table&& other){
 void Table::steal(Table& other) {
     this->open=other.isOpen();
     this->capacity=other.getCapacity();
-    this->orderList=other.getOrders();
-    this->customersList=other.getCustomers();
-    other=0;                        //Nullptr DIDNT work so i changed it to 0
+    for (int i = 0; i < other.orderList.size(); i++) {
+        this->orderList.push_back(other.orderList[i]);
+
+    }
+    for (int i = 0; i < other.customersList.size(); i++) {
+        this->customersList.push_back(other.customersList[i]);
+    }
+
 }
 
 //MoveAssignmentOperator
 Table& Table::operator=(Table&& other){
-    delete this;
     steal(other);
     return *this;
 }

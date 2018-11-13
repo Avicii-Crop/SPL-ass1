@@ -3,7 +3,7 @@
 //
 
 #ifndef SPL_ASS1_TABLE_H
-#define TABLE_H_
+#define SPL_ASS1_TABLE_H
 
 #include <vector>
 #include "../include/Customer.h"
