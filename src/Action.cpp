@@ -61,3 +61,31 @@ std::string Order::toString() const {  //NEED TO COMPLETE
 MoveCustomer::MoveCustomer(int src,int dst,int customerId):BaseAction() ,srcTable(src),dstTable(dst),id(customerId){
     
 }*/
+
+PrintTableStatus::PrintTableStatus(int id):BaseAction(),tableId(id){}
+
+void PrintTableStatus::act(Restaurant &restaurant) {
+    Table* tbl=restaurant.getTable(tableId);
+    if(tbl->isOpen()){
+        std::cout << "Table "<< std::to_string(tableId) <<" status: open" << std::endl;
+
+        std::cout << "Customers:" << std::endl;
+        for(auto customer:tbl->getCustomers())
+            std::cout << customer->getId() << " " << customer->getName() << std::endl;
+
+        std::cout << "Orders:" << std::endl;
+        for(auto order:tbl->getOrders())
+            std::cout << order.second.getName() << " " << order.second.getPrice() <<"NIS " << order.first << std::endl;
+
+        std::cout << "Current Bill: " << tbl->getBill() << "NIS" << std::endl;
+    }
+    else{
+        std::cout << "Table "<< std::to_string(tableId) <<" status: close" << std::endl;
+    }
+
+    complete();
+}
+
+std::string PrintTableStatus::toString() const {
+    return "status "+std::to_string(tableId)+" "+std::to_string(getStatus());
+}

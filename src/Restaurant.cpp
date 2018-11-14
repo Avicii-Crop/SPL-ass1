@@ -128,28 +128,23 @@ void Restaurant::openTable(std::string str){
 
     std::getline(ss,cstmrName,' ');
     int tableId=std::stoi(cstmrName,nullptr,10);
-    if(tableId>=0,tableId<tables.size(),!(tables[tableId]->isOpen())) {
+    std::string cstmrType;
+    while (std::getline(ss, cstmrName, ',')) {
+        std::getline(ss, cstmrType, ' ');
+        if (cstmrType == "veg")
+            customers.push_back(new VegetarianCustomer(cstmrName, customerCount));
+        else if (cstmrType == "chp")
+            customers.push_back(new CheapCustomer(cstmrName, customerCount));
+        else if (cstmrType == "spc")
+            customers.push_back(new SpicyCustomer(cstmrName, customerCount));
+        else if (cstmrType == "alc")
+            customers.push_back(new AlchoholicCustomer(cstmrName, customerCount));
+        customerCount++;
+    }
+    BaseAction *action = new OpenTable(tableId, customers);
+    (*action).act(*this);
+    actionsLog.push_back(action);
 
-        std::string cstmrType;
-        while (std::getline(ss, cstmrName, ',')) {
-            std::getline(ss, cstmrType, ' ');
-            if (cstmrType == "veg")
-                customers.push_back(new VegetarianCustomer(cstmrName, customerCount));
-            else if (cstmrType == "chp")
-                customers.push_back(new CheapCustomer(cstmrName, customerCount));
-            else if (cstmrType == "spc")
-                customers.push_back(new SpicyCustomer(cstmrName, customerCount));
-            else if (cstmrType == "alc")
-                customers.push_back(new AlchoholicCustomer(cstmrName, customerCount));
-            customerCount++;
-        }
-        BaseAction *action = new OpenTable(tableId, customers);
-        (*action).act(*this);
-        actionsLog.push_back(action);
-    }
-    else{
-        std:: cout <<"Table does not exist or is already open" <<std::endl;
-    }
 
 }
 

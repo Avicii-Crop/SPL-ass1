@@ -95,7 +95,7 @@ private:
 
 class PrintTableStatus : public BaseAction {
 public:
-    PrintTableStatus(int id): BaseAction(),tableId(id);
+    PrintTableStatus(int id);
     void act(Restaurant &restaurant);
     std::string toString() const;
 private:
