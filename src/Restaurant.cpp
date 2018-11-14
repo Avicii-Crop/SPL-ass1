@@ -97,6 +97,14 @@ void Restaurant::start() {
 
         }
         else if(word=="status"){
+            std::getline(ss,word,' ');
+            int tbl=std::stoi(word);
+            if(tbl>=0,tbl<tables.size()){
+                BaseAction* status= new PrintTableStatus(tbl);
+                status->act(*this);
+            }
+
+
 
         }
         else if(word=="log"){
