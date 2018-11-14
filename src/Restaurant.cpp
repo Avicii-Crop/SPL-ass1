@@ -75,7 +75,7 @@ void Restaurant::start() {
     std::string word;
 
     while(open){
-        std::cin >> input;
+        getline(std::cin,input);
         std::stringstream ss(input);
         std::getline(ss,word,' ');
         if(word=="open"){
@@ -146,8 +146,8 @@ void Restaurant::openTable(std::string str){
 }
 
 void Restaurant::Order(int id){
-    if(this->tables.size()<=id , this->getTable(id)->isOpen()) {
-        Table &tbl = this->tables[id];  //creating a ref to the table with the given id
+/*    if(this->tables.size()<=id , this->getTable(id)->isOpen()) {
+        Table &tbl = tables[id];  //creating a ref to the table with the given id
         std::string allOrders;    //use to pring in the end all the orders of the given table
         std::vector<int> customerOrders;   //vector of ordersv of a specific customer in the table
         for (int i = 0; i < tbl.getCustomers().size(); i++) {
@@ -160,7 +160,7 @@ void Restaurant::Order(int id){
         std::cout <<allOrders <<std::endl;
     }
     else
-        std::cout <<"Table does not exist or is not open" <<std::endl;
+        std::cout <<"Table does not exist or is not open" <<std::endl;*/
 }
 
 void Restaurant::initTable(int numOfTables,std::string str){
@@ -187,6 +187,19 @@ const std::vector<BaseAction *> &Restaurant::getActionsLog() const {
 
 std::vector<Dish> &Restaurant::getMenu() {
     return menu;
+}
+
+Restaurant::~Restaurant() {
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+
 }
 
 

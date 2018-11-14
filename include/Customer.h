@@ -16,7 +16,6 @@ public:
     virtual std::string toString() const = 0;
     std::string getName() const;
     int getId() const;
-    std::string getType() const;
  //   virtual Customer* clone()=0;
 private:
     const std::string name;

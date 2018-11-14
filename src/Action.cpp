@@ -3,17 +3,21 @@
 //
 
 #include "../include/Action.h"
-#include "Customer.cpp"
+#include "../include/Table.h"
+#include "../include/Restaurant.h"
+#include <iostream>
 
-BaseAction::BaseAction() {
+
+BaseAction::BaseAction():status(PENDING){
 
 }
 
 ActionStatus BaseAction::getStatus() const {
-    return COMPLETED;
+    return status;
 }
 
 void BaseAction::complete() {
+    status=COMPLETED;
 
 }
 
@@ -28,11 +32,20 @@ std::string BaseAction::getErrorMsg() const {
 OpenTable::OpenTable(int id, std::vector<Customer*> &customersList): BaseAction(),tableId(id) ,customers(customersList){}
 
 void OpenTable::act(Restaurant &restaurant) {
+    Table* tbl=restaurant.getTable(tableId);
+    for(auto customer :customers){
+        tbl->addCustomer(customer);
+    }
+    this->complete();
 
 }
 
 std::string OpenTable::toString() const {
-    return std::__cxx11::string();
+    std::string output="open "+ std::to_string(tableId);
+    for(auto customer :customers) {
+        output +=" "+customer->toString();
+    }
+    return output;
 }
 
 Order::Order(int id):BaseAction(),tableId(id) {}
@@ -44,6 +57,7 @@ std::string Order::toString() const {  //NEED TO COMPLETE
     return std::__cxx11::string();
 }
 
-MoveCustomer::MoveCustomer(int src,int dst,int customerId){
+/*
+MoveCustomer::MoveCustomer(int src,int dst,int customerId):BaseAction() ,srcTable(src),dstTable(dst),id(customerId){
     
-}
+}*/
