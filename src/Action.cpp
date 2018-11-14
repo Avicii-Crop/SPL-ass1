@@ -34,3 +34,16 @@ void OpenTable::act(Restaurant &restaurant) {
 std::string OpenTable::toString() const {
     return std::__cxx11::string();
 }
+
+Order::Order(int id):BaseAction(),tableId(id) {}
+void Order::act(Restaurant &restaurant) {
+
+}
+
+std::string Order::toString() const {  //NEED TO COMPLETE
+    return std::__cxx11::string();
+}
+
+MoveCustomer::MoveCustomer(int src,int dst,int customerId){
+    
+}

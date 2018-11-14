@@ -145,6 +145,24 @@ void Restaurant::openTable(std::string str){
 
 }
 
+void Restaurant::Order(int id){
+    if(this->tables.size()<=id , this->getTable(id)->isOpen()) {
+        Table &tbl = this->tables[id];  //creating a ref to the table with the given id
+        std::string allOrders;    //use to pring in the end all the orders of the given table
+        std::vector<int> customerOrders;   //vector of ordersv of a specific customer in the table
+        for (int i = 0; i < tbl.getCustomers().size(); i++) {
+            allOrders = allOrders + tbl.getCustomer(i)->getName() + ", " + "ordered ";
+            customerOrders = tbl.getCustomers(i).order(menu & );
+            for (int j = 0; j < customerOrders.size() - 1; j++)
+                allOrders = allOrders + customerOrders[i] + ","
+            allOrders = allOrders + customerOrders[customerOrders.size()];
+        }
+        std::cout <<allOrders <<std::endl;
+    }
+    else
+        std::cout <<"Table does not exist or is not open" <<std::endl;
+}
+
 void Restaurant::initTable(int numOfTables,std::string str){
     std::string tempStr;
     std::stringstream ss(str);

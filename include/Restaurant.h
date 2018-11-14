@@ -28,6 +28,7 @@ public:
     Restaurant(const Restaurant& restaurant);
 
 private:
+    void Order(int id);
     void openTable(std::string str);
     void initTable(int numOfTables,std::string str);    //avishai XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     bool open;
