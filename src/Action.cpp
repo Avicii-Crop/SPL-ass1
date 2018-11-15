@@ -22,22 +22,32 @@ void BaseAction::complete() {
 }
 
 void BaseAction::error(std::string errorMsg) {
-
+    status=ERROR;
+    this->errorMsg=errorMsg;
 }
 
 std::string BaseAction::getErrorMsg() const {
-    return std::__cxx11::string();
+    return this->errorMsg;
 }
 
-OpenTable::OpenTable(int id, std::vector<Customer*> &customersList): BaseAction(),tableId(id) ,customers(customersList){}
+OpenTable::OpenTable(int id, std::vector<Customer*> &customersList): BaseAction(),tableId(id) ,customers(customersList){
+
+}
+
 
 void OpenTable::act(Restaurant &restaurant) {
     Table* tbl=restaurant.getTable(tableId);
-    for(auto customer :customers){
-        tbl->addCustomer(customer);
+    if(tbl == nullptr || tbl->isOpen()) {
+        error("Table does not exist or is already open");
+        std::cout << getErrorMsg() << std::endl;
     }
-    this->complete();
-
+    else{
+        tbl->openTable();
+        for(auto customer :customers){
+            tbl->addCustomer(customer);
+        }
+        complete();
+    }
 }
 
 std::string OpenTable::toString() const {
@@ -45,36 +55,67 @@ std::string OpenTable::toString() const {
     for(auto customer :customers) {
         output +=" "+customer->toString();
     }
+    if(getStatus()==ERROR)
+        output+=" Error: "+getErrorMsg();
+    else
+        output+=" Completed";
     return output;
 }
 
 Order::Order(int id):BaseAction(),tableId(id) {}
 void Order::act(Restaurant &restaurant) {
-    if(restaurant.getTable(this->tableId) == nullptr || !restaurant.getTable(tableId)->isOpen())
-        std::cout << "Table does not exist or is not open" << std::endl;
+    Table* tbl=restaurant.getTable(tableId);
+    if(tbl == nullptr || !tbl->isOpen()){
+        error("Table does not exist or is already open");
+        std::cout << getErrorMsg() << std::endl;
+    }
     else{
-        restaurant.getTable(tableId)->order(restaurant.getMenu());
+        tbl->order(restaurant.getMenu());
+        complete();
     }
 }
 
-std::string Order::toString() const {  //NEED TO COMPLETE
-    return std::__cxx11::string();
+std::string Order::toString() const {
+    std::string output ="order "+std::to_string(tableId);
+    if(getStatus()==ERROR)
+        output+=" Error: "+getErrorMsg();
+    else
+        output+=" Completed";
+    return output;
 }
 
 
 
 MoveCustomer::MoveCustomer(int src,int dst,int customerId):BaseAction() ,srcTable(src),dstTable(dst),id(customerId){}
 void MoveCustomer::act(Restaurant &restaurant){
-    if(restaurant.getNumOfTables()<(srcTable |dstTable)| (srcTable|dstTable)<0 | !restaurant.getTable(srcTable)->isOpen()|!restaurant.getTable(dstTable)->isOpen() |
-    restaurant.getTable(dstTable)->getCapacity()==restaurant.getTable(dstTable)->getCustomers().size()|
-    restaurant.getTable(srcTable)->getCustomer(id)== nullptr)
-            std:: cout << "Cannot move customer"<< std::endl;
+    Table* srcT=restaurant.getTable(srcTable);
+    Table* dstT=restaurant.getTable(dstTable);
+    if((srcT== nullptr||dstT== nullptr) || (!srcT->isOpen()|| !dstT->isOpen() ) ||
+    dstT->getCapacity()==dstT->getCustomers().size()|| srcT->getCustomer(id)== nullptr){
+        error("Cannot move customer");
+        std:: cout << getErrorMsg()<< std::endl;
+    }
     else{
-        restaurant.getTable(dstTable)->addCustomer(restaurant.getTable(srcTable)->getCustomer(id));  //NEED TO ADD TO THE NEW TABLE THE CUSTOMERS ORDERS AND DELETE THEM (AND THEIR PRICES) FROM THE SRCTABLE
+        dstT->addCustomer(srcT->getCustomer(id));  //NEED TO ADD TO THE NEW TABLE THE CUSTOMERS ORDERS AND DELETE THEM (AND THEIR PRICES) FROM THE SRCTABLE
+        for(auto order:srcT->getOrders()){
+            if(order.first==id){
+                dstT->getOrders().push_back(OrderPair(id,order.second));
+            }
+        }
+        srcT->removeCustomer(id);
+        complete();
 
     }
 }
 
+std::string MoveCustomer::toString() const {
+    std::string output ="move "+std::to_string(srcTable)+" "+std::to_string(dstTable)+" "+std::to_string(id);
+    if(getStatus()==ERROR)
+        output+=" Error: "+getErrorMsg();
+    else
+        output+=" Completed";
+    return output;
+}
 
 PrintTableStatus::PrintTableStatus(int id):BaseAction(),tableId(id){}
 

@@ -52,7 +52,6 @@ Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerC
             std::getline(ss,dishName,',');
             std::getline(ss,dishType,',');
             std::getline(ss,dishPrice,',');
-            std::cout << nextLn << std::endl;
             if(dishType=="VEG")
                 menu.push_back(Dish(dishId,dishName,std::stoi(dishPrice, nullptr,10),VEG));
             else if(dishType=="ALC")
@@ -88,7 +87,14 @@ void Restaurant::start() {
             action->act(*this);
         }
         else if(word=="move"){
-
+            std::getline(ss,word,' ');
+            int strt=std::stoi(word);
+            std::getline(ss,word,' ');
+            int dst=std::stoi(word);
+            std::getline(ss,word,' ');
+            int id=std::stoi(word);
+            BaseAction* action=new MoveCustomer(strt,dst,id);
+            action->act(*this);
         }
         else if(word=="close"){
 
@@ -151,23 +157,7 @@ void Restaurant::openTable(std::string str){
 
 }
 
-void Restaurant::Order(int id){
-/*    if(this->tables.size()<=id , this->getTable(id)->isOpen()) {
-        Table &tbl = tables[id];  //creating a ref to the table with the given id
-        std::string allOrders;    //use to pring in the end all the orders of the given table
-        std::vector<int> customerOrders;   //vector of ordersv of a specific customer in the table
-        for (int i = 0; i < tbl.getCustomers().size(); i++) {
-            allOrders = allOrders + tbl.getCustomer(i)->getName() + ", " + "ordered ";
-            customerOrders = tbl.getCustomers(i).order(menu & );
-            for (int j = 0; j < customerOrders.size() - 1; j++)
-                allOrders = allOrders + customerOrders[i] + ","
-            allOrders = allOrders + customerOrders[customerOrders.size()];
-        }
-        std::cout <<allOrders <<std::endl;
-    }
-    else
-        std::cout <<"Table does not exist or is not open" <<std::endl;*/
-}
+
 
 void Restaurant::initTable(int numOfTables,std::string str){
     std::string tempStr;
@@ -183,7 +173,9 @@ int Restaurant::getNumOfTables() const {
 }
 
 Table *Restaurant::getTable(int ind) {
-    return tables[ind-1];
+    if(ind>=0,ind<tables.size())
+        return tables[ind];
+    return nullptr;
 
 }
 

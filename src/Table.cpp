@@ -18,10 +18,12 @@ void Table::addCustomer(Customer* customer){customersList.push_back(customer);}
 
 void Table::removeCustomer(int id) {
 
-    std::vector<Customer*>::iterator it=customersList.begin();
+
     bool found= false;                          //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       for(int i=0;i<customersList.size(), !found;i++) { //while(it != customersList.end(),!found)
         if(customersList[i]->getId()==id){         //might have to change (*it) to customerList[i]XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            delete(*(customersList.begin()+i));
+            *(customersList.begin()+i)= nullptr;
             customersList.erase(customersList.begin()+i);
             found=true;
         }
@@ -29,10 +31,15 @@ void Table::removeCustomer(int id) {
 
     //removing the customer orders from the table
     if(found){
-        std::vector<OrderPair>::iterator orderIt=orderList.begin();
-        while(orderIt!=orderList.end()){
-            if((*orderIt).first==id)
-                orderList.erase(orderIt);
+        int j=0;
+        for(int i=0;i<(orderList.size()-j);i++
+        while(i<orderList.size()){
+            if(orderList[i].first==id){
+                delete(orderList[i].second);
+                orderList.erase(orderList.begin()+i);
+            }
+            else
+                i++;
         }
     }
 }
@@ -46,7 +53,9 @@ Customer* Table::getCustomer(int id) {  //if the id is not in the table return n
             found = true;
         }
     }
-    return output;
+    if(found)
+        return output;
+    return nullptr;
 }
 
 std::vector<Customer*>& Table::getCustomers(){return customersList;}
@@ -58,13 +67,13 @@ void Table::openTable(){open=true;}
 bool Table::isOpen(){return open;}
 
 void Table::order(const std::vector<Dish> &menu){
-    std::vector<Customer*>::iterator it=customersList.begin();
-    std::vector<int> itCustomerOrders;
-    while(it!=customersList.end()) {
-        itCustomerOrders = (*it)->order(menu);
-        for (int i = 0; i < itCustomerOrders.size(); i++) {
-            orderList.push_back(OrderPair((*it)->getId(), menu[itCustomerOrders[i]]));
-            std::cout<<(*it)->getName()<<" ordered " << menu[itCustomerOrders[i]].getName()<< std::endl;
+
+    std::vector<int> CustomerOrders;
+    for(auto customer:customersList) {
+        CustomerOrders = customer->order(menu);
+        for (int i = 0; i < CustomerOrders.size(); i++) {
+            orderList.push_back(OrderPair(customer->getId(), menu[CustomerOrders[i]]));
+            std::cout<<customer->getName()<<" ordered " << menu[CustomerOrders[i]].getName()<< std::endl;
         }
     }
 }
@@ -125,7 +134,7 @@ Table::Table(Table&& other):open(other.isOpen()),capacity(other.getCapacity()){
 }
 
 //MoveAssignmentOperator
-Table& Table::operator=(Table&& other){
+/*Table& Table::operator=(Table&& other){
     if(this!=&other){
         this->orderList.clear();
         for(int i=0;i<this->customersList.size();i++){
@@ -142,4 +151,4 @@ Table& Table::operator=(Table&& other){
 
     }
     return *this;
-}
+}*/
