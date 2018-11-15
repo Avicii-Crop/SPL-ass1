@@ -97,10 +97,14 @@ void Restaurant::start() {
             action->act(*this);
         }
         else if(word=="close"){
-
+            std::getline(ss,word,' ');
+            int tableId=std::stoi(word);
+            BaseAction* action=new Close(tableId);
+            action->act(*this);
         }
         else if(word=="closeall"){
-
+            BaseAction* action=new CloseAll();
+            action->act(*this);
         }
         else if(word=="menu"){
 

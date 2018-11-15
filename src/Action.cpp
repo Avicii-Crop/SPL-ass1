@@ -146,3 +146,54 @@ std::string PrintTableStatus::toString() const {
 
 }
 
+Close::Close(int id): BaseAction(), tableId(id){}
+
+void Close::act(Restaurant &restaurant) {
+    Table* table=restaurant.getTable(tableId);
+    if(table== nullptr ||!table->isOpen()){
+        error("Table does not exist or is not open");
+        std::cout<< getErrorMsg()<< std::endl;
+    }
+    else{
+        for(auto customer:table->getCustomers())
+            table->removeCustomer(customer->getId());
+        table->closeTable();
+        std::cout<<"Table "<<tableId<<"was closed. Bill "<<table->getBill()<<std::endl;
+        complete();
+    }
+
+
+}
+
+std::string Close::toString() const {
+    std::string output ="close "+std::to_string(tableId);
+    if(getStatus()==ERROR)
+        output+=" Error: "+getErrorMsg();
+    else
+        output+=" Completed";
+    return output;
+}
+
+CloseAll::CloseAll(): BaseAction() {}
+
+void CloseAll::act(Restaurant &restaurant) {
+    for(int i=0; i<restaurant.getNumOfTables();i++){
+        if(restaurant.getTable(i)->isOpen()){
+            Close action=Close(i);
+            action.act(restaurant);
+            std::cout<<action.toString()<<std::
+        }
+        complete();
+
+    }
+
+}
+
+std::string CloseAll::toString() const {
+    std::string output ="closeall ";
+    if(getStatus()==COMPLETED)
+        output+=" Completed";
+    else
+        output+=" Pending";
+    return output;
+}

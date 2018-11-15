@@ -32,15 +32,14 @@ void Table::removeCustomer(int id) {
     //removing the customer orders from the table
     if(found){
         int j=0;
-        for(int i=0;i<(orderList.size()-j);i++
-        while(i<orderList.size()){
-            if(orderList[i].first==id){
-                delete(orderList[i].second);
-                orderList.erase(orderList.begin()+i);
-            }
-            else
-                i++;
+        std::vector<OrderPair> tmpOrderList;
+        for(auto order:orderList) {
+            if (order.first != id)
+                tmpOrderList.push_back(order);
         }
+        orderList.clear();
+        for(auto order:tmpOrderList)
+                orderList.push_back(order);
     }
 }
 
