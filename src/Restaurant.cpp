@@ -32,16 +32,16 @@ Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerC
     while (std::getline(sourceFile,nextLn)){
         if(firstStage){
 
-                while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
-                    std::getline(sourceFile,nextLn);
-                int tempInt=std::stoi(nextLn, nullptr,10);
-
+            while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
                 std::getline(sourceFile,nextLn);
-                while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
-                    std::getline(sourceFile,nextLn);
-                initTable(tempInt,nextLn);
+            int tempInt=std::stoi(nextLn, nullptr,10);
 
-                firstStage=false;
+            std::getline(sourceFile,nextLn);
+            while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
+                std::getline(sourceFile,nextLn);
+            initTable(tempInt,nextLn);
+
+            firstStage=false;
 
         }
         else{
@@ -79,10 +79,13 @@ void Restaurant::start() {
         std::stringstream ss(input);
         std::getline(ss,word,' ');
         if(word=="open"){
-                openTable(input.substr(5));
+            openTable(input.substr(5));
         }
         else if(word=="order"){
-
+            std::getline(ss,word,' ');
+            int tableId=std::stoi(word);
+            BaseAction* action=new Order(tableId);
+            action->act(*this);
         }
         else if(word=="move"){
 
@@ -204,6 +207,3 @@ Restaurant::~Restaurant() {
     }
 
 }
-
-
-

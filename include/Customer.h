@@ -16,7 +16,7 @@ public:
     virtual std::string toString() const = 0;
     std::string getName() const;
     int getId() const;
- //   virtual Customer* clone()=0;
+    virtual Customer* clone()=0;
 private:
     const std::string name;
     const int id;
@@ -28,7 +28,7 @@ public:
     VegetarianCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
-    VegetarianCustomer* clone();
+    Customer* clone();
 private:
 };
 
@@ -38,7 +38,7 @@ public:
     CheapCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
-  //  CheapCustomer* clone();
+    Customer* clone();
 private:
     bool ordered;
 };
@@ -49,7 +49,7 @@ public:
     SpicyCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Dish> &menu);
     std::string toString() const;
-    //SpicyCustomer* clone();
+    Customer* clone();
 private:
     int orderCount;
     int bvgId;
@@ -62,7 +62,7 @@ public:
     std::vector<int> order(const std::vector<Dish> &menu);
     inline void sortALC(const std::vector<Dish> &menu);
     std::string toString() const;
-   // AlchoholicCustomer* clone();
+    Customer* clone();
 
 private:
     std::vector<int> sortedALC;

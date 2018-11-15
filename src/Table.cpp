@@ -16,16 +16,15 @@ int Table::getCapacity() const {return this->capacity;}
 
 void Table::addCustomer(Customer* customer){customersList.push_back(customer);}
 
-void Table::removeCustomer(int id) {/*
+void Table::removeCustomer(int id) {
 
     std::vector<Customer*>::iterator it=customersList.begin();
     bool found= false;                          //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    while(it != customersList.end(),!found){   //for(int i=0;i<customersList.size(), !found;i++) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        if((*it)->getId()==id){         //might have to change (*it) to customerList[i]XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            customersList.erase(it);
+      for(int i=0;i<customersList.size(), !found;i++) { //while(it != customersList.end(),!found)
+        if(customersList[i]->getId()==id){         //might have to change (*it) to customerList[i]XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            customersList.erase(customersList.begin()+i);
             found=true;
         }
-        it++;
     }
 
     //removing the customer orders from the table
@@ -35,7 +34,7 @@ void Table::removeCustomer(int id) {/*
             if((*orderIt).first==id)
                 orderList.erase(orderIt);
         }
-    }*/
+    }
 }
 
 Customer* Table::getCustomer(int id) {  //if the id is not in the table return nullptr.
@@ -88,44 +87,59 @@ Table:: ~Table(){
 }
 
 //CopyConstructor
-Table::Table(const Table& table):capacity(table.getCapacity()),orderList(table.orderList),open(table.open){
-    for(int i=0;i<table.customersList.size();i++)
-        this->customersList[i]=table.customersList[i];
+Table::Table(Table& other):capacity(other.getCapacity()),orderList(other.orderList),open(other.open){
+    for(int i=0;i<other.customersList.size();i++)
+        this->customersList.push_back(other.customersList[i]->clone());
+    for (int i = 0; i < other.orderList.size(); i++)
+        this->orderList.push_back(other.orderList[i]);
 
 }
 //copy assignment operator
 Table& Table::operator=(const Table& other) {
     if(this==&other)
         return *this;
-   // delete this;        //MOST CHECK HOW EXACTLY SHOULD WE DELETE 'THIS' BEFORE ASSIGN OTHER INTO IT
     this->capacity = other.getCapacity();
-    open = other.open;                        //Deleted the 'this' before open
+    this->open = other.open;                        //Deleted the 'this' before open
+    for (int i = 0; i < this->customersList.size(); i++) {
+        delete(this->customersList[i]);
+        this->customersList[i]= nullptr;
+    }
+    this->orderList.clear();
     for (int i = 0; i < other.orderList.size(); i++)
         this->orderList.push_back(other.orderList[i]);
+
     for (int i = 0; i < other.customersList.size(); i++)
         this->customersList.push_back(other.customersList[i]);
 }
 //MoveConstructor
-Table::Table(Table&& other){
-    steal(other);
-
-}
-
-void Table::steal(Table& other) {
-    this->open=other.isOpen();
-    this->capacity=other.getCapacity();
-    for (int i = 0; i < other.orderList.size(); i++) {
+Table::Table(Table&& other):open(other.isOpen()),capacity(other.getCapacity()){
+    for (int i = 0; i < other.orderList.size(); i++)
         this->orderList.push_back(other.orderList[i]);
 
-    }
     for (int i = 0; i < other.customersList.size(); i++) {
         this->customersList.push_back(other.customersList[i]);
+        other.customersList[i]= nullptr;
     }
-
+    other.customersList.clear();
+    other.orderList.clear();
 }
 
 //MoveAssignmentOperator
 Table& Table::operator=(Table&& other){
-    steal(other);
+    if(this!=&other){
+        this->orderList.clear();
+        for(int i=0;i<this->customersList.size();i++){
+            delete(this->customersList[i]);
+            this->customersList[i]= nullptr;
+        }
+        this->customersList.clear();
+        this->customersList=other.customersList;
+        other.customersList.clear();
+        this->orderList=other.orderList;
+        other.orderList.clear();
+        this->capacity=other.capacity;
+        this->open=other.open;
+
+    }
     return *this;
 }
