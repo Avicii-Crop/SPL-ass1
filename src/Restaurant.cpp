@@ -18,6 +18,8 @@
 
 Restaurant::Restaurant():open(false),customerCount(0) {}
 
+Restaurant::Restaurant(bool status,int count):open(status),customerCount(count) {}
+
 Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerCount(0){
     std::ifstream sourceFile(configFilePath);
     std::string nextLn="";
@@ -83,8 +85,8 @@ void Restaurant::start() {
         else if(word=="order"){
             std::getline(ss,word,' ');
             int tableId=std::stoi(word);
-            BaseAction* action=new Order(tableId);
-            action->act(*this);
+            actionsLog.push_back(new Order(tableId));
+            actionsLog.back()->act(*this);
         }
         else if(word=="move"){
             std::getline(ss,word,' ');
@@ -93,40 +95,44 @@ void Restaurant::start() {
             int dst=std::stoi(word);
             std::getline(ss,word,' ');
             int id=std::stoi(word);
-            BaseAction* action=new MoveCustomer(strt,dst,id);
-            action->act(*this);
+            actionsLog.push_back(new MoveCustomer(strt,dst,id));
+            actionsLog.back()->act(*this);
         }
         else if(word=="close"){
             std::getline(ss,word,' ');
             int tableId=std::stoi(word);
-            BaseAction* action=new Close(tableId);
-            action->act(*this);
+            actionsLog.push_back(new Close(tableId));
+            actionsLog.back()->act(*this);
         }
         else if(word=="closeall"){
-            BaseAction* action=new CloseAll();
-            action->act(*this);
+            actionsLog.push_back(new CloseAll());
+            actionsLog.back()->act(*this);
         }
         else if(word=="menu"){
-
+            actionsLog.push_back(new PrintMenu());
+            actionsLog.back()->act(*this);
         }
         else if(word=="status"){
             std::getline(ss,word,' ');
             int tbl=std::stoi(word);
             if(tbl>=0,tbl<tables.size()){
-                BaseAction* status= new PrintTableStatus(tbl);
-                status->act(*this);
+                actionsLog.push_back( new PrintTableStatus(tbl));
+                actionsLog.back()->act(*this);
             }
-
-
-
         }
         else if(word=="log"){
-
+            BaseAction* action= new PrintActionsLog();
+            action->act(*this);
+            actionsLog.push_back(action);
+            action= 0;
         }
         else if(word=="backup"){
-
+            actionsLog.push_back( new BackupRestaurant());
+            actionsLog.back()->act(*this);
         }
         else if(word=="restore"){
+            actionsLog.push_back( new BackupRestaurant());
+            actionsLog.back()->act(*this);
 
         }
 
@@ -154,9 +160,9 @@ void Restaurant::openTable(std::string str){
             customers.push_back(new AlchoholicCustomer(cstmrName, customerCount));
         customerCount++;
     }
-    BaseAction *action = new OpenTable(tableId, customers);
-    (*action).act(*this);
-    actionsLog.push_back(action);
+    actionsLog.push_back(new OpenTable(tableId, customers));
+    actionsLog.back()->act(*this);
+
 
 
 }
@@ -171,7 +177,9 @@ void Restaurant::initTable(int numOfTables,std::string str){
         tables.push_back(new Table(std::stoi(tempStr, nullptr,10)));
     }
 }
-
+int Restaurant::getCustomerCount() const {
+    return customerCount;
+}
 int Restaurant::getNumOfTables() const {
     return tables.size();
 }
@@ -189,6 +197,37 @@ const std::vector<BaseAction *> &Restaurant::getActionsLog() const {
 
 std::vector<Dish> &Restaurant::getMenu() {
     return menu;
+}
+
+Restaurant& Restaurant::operator=(Restaurant&& other) {
+    if(this==&other)
+        return *this;
+    this->open = other.open;
+    this->customerCount = other.customerCount;
+    this->menu.clear();
+    for(auto dish:other.menu)
+        this->menu.push_back(Dish(dish.getId(),dish.getName(),dish.getPrice(),dish.getType()));
+
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+    tables.clear();
+
+    for(auto table:other.tables)
+        this->tables.push_back(new Table(*table));
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+    actionsLog.clear();
+
+    for(auto action:other.actionsLog)
+        this->actionsLog.push_back(action->clone());
+
+
+
 }
 
 Restaurant::~Restaurant() {

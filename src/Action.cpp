@@ -30,9 +30,7 @@ std::string BaseAction::getErrorMsg() const {
     return this->errorMsg;
 }
 
-OpenTable::OpenTable(int id, std::vector<Customer*> &customersList): BaseAction(),tableId(id) ,customers(customersList){
-
-}
+OpenTable::OpenTable(int id, std::vector<Customer*> &customersList): BaseAction(),tableId(id) ,customers(customersList){}
 
 
 void OpenTable::act(Restaurant &restaurant) {
@@ -48,6 +46,10 @@ void OpenTable::act(Restaurant &restaurant) {
         }
         complete();
     }
+}
+
+BaseAction* OpenTable::clone(){
+    return new OpenTable(*this);
 }
 
 std::string OpenTable::toString() const {
@@ -73,6 +75,10 @@ void Order::act(Restaurant &restaurant) {
         tbl->order(restaurant.getMenu());
         complete();
     }
+}
+
+BaseAction* Order::clone(){
+    return new Order(*this);
 }
 
 std::string Order::toString() const {
@@ -108,6 +114,11 @@ void MoveCustomer::act(Restaurant &restaurant){
     }
 }
 
+BaseAction* MoveCustomer::clone(){
+    return new MoveCustomer(*this);
+}
+
+
 std::string MoveCustomer::toString() const {
     std::string output ="move "+std::to_string(srcTable)+" "+std::to_string(dstTable)+" "+std::to_string(id);
     if(getStatus()==ERROR)
@@ -141,6 +152,11 @@ void PrintTableStatus::act(Restaurant &restaurant) {
     complete();
 }
 
+BaseAction* PrintTableStatus::clone(){
+    return new PrintTableStatus(*this);
+}
+
+
 std::string PrintTableStatus::toString() const {
     return "status "+std::to_string(tableId)+" "+std::to_string(getStatus());
 
@@ -165,6 +181,11 @@ void Close::act(Restaurant &restaurant) {
 
 }
 
+BaseAction* Close::clone(){
+    return new Close(*this);
+}
+
+
 std::string Close::toString() const {
     std::string output ="close "+std::to_string(tableId);
     if(getStatus()==ERROR)
@@ -181,7 +202,7 @@ void CloseAll::act(Restaurant &restaurant) {
         if(restaurant.getTable(i)->isOpen()){
             Close action=Close(i);
             action.act(restaurant);
-            std::cout<<action.toString()<<std::
+            std::cout<<action.toString()<<std::endl;
         }
         complete();
 
@@ -189,11 +210,63 @@ void CloseAll::act(Restaurant &restaurant) {
 
 }
 
+BaseAction* CloseAll::clone(){
+    return new CloseAll(*this);
+}
+
+
 std::string CloseAll::toString() const {
-    std::string output ="closeall ";
+    std::string output ="closeall";
     if(getStatus()==COMPLETED)
         output+=" Completed";
     else
         output+=" Pending";
     return output;
+}
+
+BackupRestaurant::BackupRestaurant():BaseAction(){}
+
+void BackupRestaurant::act(Restaurant &restaurant){
+    backup->operator=(restaurant);
+    complete();
+}
+
+BaseAction* BackupRestaurant::clone(){
+    return new BackupRestaurant(*this);
+}
+
+
+std::string BackupRestaurant::toString() const {
+    std::string output ="backup";
+    if(getStatus()==COMPLETED)
+        output+=" Completed";
+    else
+        output+=" Pending";
+    return output;
+}
+
+RestoreResturant::RestoreResturant():BaseAction() {}
+
+void RestoreResturant::act(Restaurant &restaurant) {
+    if(backup== nullptr){
+        error("No backup available");
+        std::cout<< getErrorMsg()<< std::endl;
+    }
+    else{
+        restaurant.operator=(*backup);
+        complete();
+    }
+}
+
+std::string RestoreResturant::toString() const {
+    std::string output ="restore";
+    if(getStatus()==ERROR)
+        output+=" Error: "+getErrorMsg();
+    else
+        output+=" Completed";
+    return output;
+}
+
+BaseAction *RestoreResturant::clone() {
+    return new RestoreResturant(*this);
 }
