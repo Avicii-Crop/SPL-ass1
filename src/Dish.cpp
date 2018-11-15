@@ -11,9 +11,9 @@ Dish::Dish(int d_id, std::string d_name, int d_price, DishType d_type):id(d_id),
 //Dish::Dish(const Dish& other): id(other.getId()),name(other.getName()),price(other.getPrice()),type(other.getType()){}
 //Copy Operator NOT FINISHED!!!
 //void Dish::operator=(const Dish& other){
-  // if(this!= &other){
-     //   delete this;
-     //   this=new Dish(other);
+// if(this!= &other){
+//   delete this;
+//   this=new Dish(other);
 //    }
 //}
 
@@ -35,4 +35,17 @@ DishType Dish::getType() const{
     return type;
 }
 
+std::string Dish::tostring(){
+    std::string output=this->getName()+" ";
+    if(this->getType()==VEG)
+        output=output+"VEG" + " ";
+    if(this->getType()==SPC)
+        output=output+"SPC" + " ";
+    if(this->getType()==BVG)
+        output=output+"BVG" + " ";
+    if(this->getType()==ALC)
+        output=output+"ALC" + " ";
+    output=output+std::to_string(this->getPrice())+" "+std::to_string(this->getPrice())+"NIS";
+    return output;
 
+}

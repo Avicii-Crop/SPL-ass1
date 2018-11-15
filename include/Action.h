@@ -10,7 +10,7 @@
 #include "../include/Customer.h"
 #include "../include/Restaurant.h"
 
-extern Restaurant* backup;
+
 
 enum ActionStatus{
     PENDING, COMPLETED, ERROR
@@ -18,6 +18,7 @@ enum ActionStatus{
 
 //Forward declaration
 class Restaurant;
+extern Restaurant* backup;
 
 class BaseAction{
 public:

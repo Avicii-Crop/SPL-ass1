@@ -177,9 +177,7 @@ void Restaurant::initTable(int numOfTables,std::string str){
         tables.push_back(new Table(std::stoi(tempStr, nullptr,10)));
     }
 }
-int Restaurant::getCustomerCount() const {
-    return customerCount;
-}
+
 int Restaurant::getNumOfTables() const {
     return tables.size();
 }
@@ -192,7 +190,7 @@ Table *Restaurant::getTable(int ind) {
 }
 
 const std::vector<BaseAction *> &Restaurant::getActionsLog() const {
-    return actionsLog;
+    return actionsLog ;
 }
 
 std::vector<Dish> &Restaurant::getMenu() {

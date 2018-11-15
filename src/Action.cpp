@@ -97,7 +97,7 @@ void MoveCustomer::act(Restaurant &restaurant){
     Table* srcT=restaurant.getTable(srcTable);
     Table* dstT=restaurant.getTable(dstTable);
     if((srcT== nullptr||dstT== nullptr) || (!srcT->isOpen()|| !dstT->isOpen() ) ||
-    dstT->getCapacity()==dstT->getCustomers().size()|| srcT->getCustomer(id)== nullptr){
+       dstT->getCapacity()==dstT->getCustomers().size()|| srcT->getCustomer(id)== nullptr){
         error("Cannot move customer");
         std:: cout << getErrorMsg()<< std::endl;
     }
@@ -127,6 +127,25 @@ std::string MoveCustomer::toString() const {
         output+=" Completed";
     return output;
 }
+
+PrintMenu::PrintMenu():BaseAction(){}
+
+void PrintMenu::act(Restaurant &restaurant){
+    int size=restaurant.getMenu().size();
+    for(int i=0;i<size;i++)
+        std::cout << restaurant.getMenu()[i].tostring() <<std::endl;
+    complete();
+}
+
+std::string PrintMenu::toString() const {
+    std::string output="menu ";
+    if(this->getStatus()==COMPLETED)
+        output=output+"Completed";
+    else
+        output=output+"Pending";
+    return output;
+}
+
 
 PrintTableStatus::PrintTableStatus(int id):BaseAction(),tableId(id){}
 
@@ -160,6 +179,25 @@ BaseAction* PrintTableStatus::clone(){
 std::string PrintTableStatus::toString() const {
     return "status "+std::to_string(tableId)+" "+std::to_string(getStatus());
 
+}
+
+PrintActionsLog::PrintActionsLog():BaseAction() {}
+
+void PrintActionsLog::act(Restaurant &restaurant) {
+    std::string output;
+    int size=restaurant.getActionsLog().size();
+    for(int i=0;i<size;i++)
+        output=output+restaurant.getActionsLog()[i]->toString();
+    complete();
+}
+
+std::string PrintActionsLog::toString() const {
+    std::string output="log ";
+    if(this->getStatus()==COMPLETED)
+        output=output+"Completed";
+    else
+        output=output+"Pending";
+    return output;
 }
 
 Close::Close(int id): BaseAction(), tableId(id){}
@@ -198,7 +236,8 @@ std::string Close::toString() const {
 CloseAll::CloseAll(): BaseAction() {}
 
 void CloseAll::act(Restaurant &restaurant) {
-    for(int i=0; i<restaurant.getNumOfTables();i++){
+    int size=restaurant.getNumOfTables();
+    for(int i=0; i<size;i++){
         if(restaurant.getTable(i)->isOpen()){
             Close action=Close(i);
             action.act(restaurant);
