@@ -16,9 +16,8 @@
 
 
 
-Restaurant::Restaurant():open(false),customerCount(0) {}
+Restaurant::Restaurant():open(false),customerCount(0)  {}
 
-Restaurant::Restaurant(bool status,int count):open(status),customerCount(count) {}
 
 Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerCount(0){
     std::ifstream sourceFile(configFilePath);
@@ -131,7 +130,7 @@ void Restaurant::start() {
             actionsLog.back()->act(*this);
         }
         else if(word=="restore"){
-            actionsLog.push_back( new BackupRestaurant());
+            actionsLog.push_back( new RestoreResturant());
             actionsLog.back()->act(*this);
 
         }
@@ -189,15 +188,55 @@ Table *Restaurant::getTable(int ind) {
 
 }
 
-const std::vector<BaseAction *> &Restaurant::getActionsLog() const {
+const std::vector<BaseAction*> &Restaurant::getActionsLog() const {
     return actionsLog ;
 }
 
 std::vector<Dish> &Restaurant::getMenu() {
     return menu;
 }
-
+//MoveAssignmentOperator
 Restaurant& Restaurant::operator=(Restaurant&& other) {
+    if(this==&other)
+        return *this;
+    this->open = other.open;
+    this->customerCount = other.customerCount;
+    this->menu.clear();
+    for(auto dish:other.menu)
+        this->menu.push_back(Dish(dish.getId(), dish.getName(), dish.getPrice(), dish.getType()));
+
+
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+    tables.clear();
+
+    for(auto table:other.tables) {
+        this->tables.push_back(new Table(*table));
+        delete(table);
+        table= nullptr;
+    }
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+    actionsLog.clear();
+
+    for(auto action:other.actionsLog) {
+        this->actionsLog.push_back(action->clone());
+        delete(action);
+        action= nullptr;
+    }
+
+    return *this;
+
+
+
+}
+// Copy operator
+Restaurant &Restaurant::operator=(const Restaurant &other) {
     if(this==&other)
         return *this;
     this->open = other.open;
@@ -224,7 +263,9 @@ Restaurant& Restaurant::operator=(Restaurant&& other) {
     for(auto action:other.actionsLog)
         this->actionsLog.push_back(action->clone());
 
+}
 
+Restaurant::Restaurant(const Restaurant &restaurant) {
 
 }
 

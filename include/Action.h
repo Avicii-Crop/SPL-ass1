@@ -1,14 +1,13 @@
 //
-// Created by achikamor on 13/11/18.
+// Created by vaismav@wincs.cs.bgu.ac.il on 11/16/18.
 //
 
 #ifndef SPL_ASS1_ACTION_H
 #define SPL_ASS1_ACTION_H
-
 #include <string>
 #include <iostream>
 #include "../include/Customer.h"
-#include "../include/Restaurant.h"
+
 
 
 
@@ -45,7 +44,7 @@ public:
     BaseAction* clone();
 private:
     const int tableId;
-    const std::vector<Customer *> customers;
+    std::vector<Customer *> customers;
 };
 
 
@@ -145,5 +144,4 @@ public:
 };
 
 
-#endif
-
+#endif //SPL_ASS1_ACTION_H

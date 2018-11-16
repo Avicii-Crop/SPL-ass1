@@ -69,12 +69,12 @@ bool Table::isOpen(){return open;}
 
 void Table::order(const std::vector<Dish> &menu){
 
-    std::vector<int> CustomerOrders;
+    std::vector<int> customerOrders;
     for(auto customer:customersList) {
-        CustomerOrders = customer->order(menu);
-        for (int i = 0; i < CustomerOrders.size(); i++) {
-            orderList.push_back(OrderPair(customer->getId(), menu[CustomerOrders[i]]));
-            std::cout<<customer->getName()<<" ordered " << menu[CustomerOrders[i]].getName()<< std::endl;
+        customerOrders = customer->order(menu);
+        for (auto order:customerOrders) {
+            orderList.push_back(OrderPair(customer->getId(), menu[order]));
+            std::cout<<customer->getName()<<" ordered " << menu[order].getName()<< std::endl;
         }
     }
 }
@@ -140,7 +140,7 @@ Table::Table(Table&& other):open(other.isOpen()),capacity(other.getCapacity()){
     other.orderList.clear();
 }
 
-//MoveAssignmentOperator
+
 Table& Table::operator=(Table&& other){
     if(this!=&other){
         this->capacity=other.capacity;

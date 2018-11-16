@@ -3,4 +3,4 @@ project(SPL_ass1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(SPL_ass1 src/Main.cpp src/Dish.cpp include/Dish.h src/Action.cpp include/Action.h src/Table.cpp include/Table.h src/Customer.cpp include/Customer.h src/Restaurant.cpp include/Restaurant.h)
+add_executable(SPL_ass1 src/Main.cpp src/Dish.cpp include/Dish.h src/Action.cpp src/Table.cpp include/Table.h src/Customer.cpp include/Customer.h src/Restaurant.cpp include/Restaurant.h include/Action.h)

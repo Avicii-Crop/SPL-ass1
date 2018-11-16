@@ -137,6 +137,10 @@ void PrintMenu::act(Restaurant &restaurant){
     complete();
 }
 
+BaseAction *PrintMenu::clone() {
+    return new PrintMenu(*this);
+}
+
 std::string PrintMenu::toString() const {
     std::string output="menu ";
     if(this->getStatus()==COMPLETED)
@@ -184,11 +188,15 @@ std::string PrintTableStatus::toString() const {
 PrintActionsLog::PrintActionsLog():BaseAction() {}
 
 void PrintActionsLog::act(Restaurant &restaurant) {
-    std::string output;
-    int size=restaurant.getActionsLog().size();
-    for(int i=0;i<size;i++)
-        output=output+restaurant.getActionsLog()[i]->toString();
-    complete();
+
+        for(auto action:restaurant.getActionsLog())
+            std::cout << action->toString() << std::endl;
+        complete();
+
+}
+
+BaseAction *PrintActionsLog::clone() {
+    return new PrintActionsLog(*this);
 }
 
 std::string PrintActionsLog::toString() const {
