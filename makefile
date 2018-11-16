@@ -1,12 +1,11 @@
-23 lines ...# All Targets
 all: rest
 
 # Tool invocations
 # Executable "rest" depends on the files bin/Dish.o bin/Customer.o bin/Table.o bin/Action.o bin/Restaurant.o bin/Main.o
 rest: bin/Dish.o bin/Customer.o bin/Table.o bin/Action.o bin/Restaurant.o bin/Main.o
-	@echo 'Building target: hello'
+	@echo 'Building target: rest'
 	@echo 'Invoking: C++ Linker'
-	g++ -o bin/rest ,bin/Dish.o ,bin/Customer.o bin/Table.o bin/Action.o bin/Restaurant.o bin/Main.o
+	g++ -o bin/rest bin/Dish.o bin/Customer.o bin/Table.o bin/Action.o bin/Restaurant.o bin/Main.o
 	@echo 'Finished building target: rest'
 	@echo ' '
 
@@ -15,12 +14,12 @@ bin/Dish.o: src/Dish.cpp
 	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Dish.o src/Dish.cpp
 
 # Depends on the source and header files 
-bin/Customer.o: src/RCustomer.cpp
+bin/Customer.o: src/Customer.cpp
 	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Customer.o src/Customer.cpp
 
 # Depends on the source and header files
 bin/Table.o: src/Table.cpp
-    g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Table.o src/Table.cpp
+	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Table.o src/Table.cpp
 
 # Depends on the source and header files
 bin/Action.o: src/Action.cpp
