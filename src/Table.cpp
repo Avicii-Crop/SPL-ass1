@@ -16,38 +16,47 @@ int Table::getCapacity() const {return this->capacity;}
 
 void Table::addCustomer(Customer* customer){customersList.push_back(customer);}
 
-void Table::removeCustomer(int id) {/*
+void Table::removeCustomer(int id) {
 
-    std::vector<Customer*>::iterator it=customersList.begin();
-    bool found= false;                          //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    while(it != customersList.end(),!found){   //for(int i=0;i<customersList.size(), !found;i++) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        if((*it)->getId()==id){         //might have to change (*it) to customerList[i]XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            customersList.erase(it);
+
+    bool found= false;
+    int size=((int)this->customersList.size());
+    for(int i=0;i<size, !found;i++) {
+        if(customersList[i]->getId()==id){
+            delete(*(customersList.begin()+i));
+            *(customersList.begin()+i)= nullptr;
+            customersList.erase(customersList.begin()+i);
             found=true;
         }
-        it++;
     }
 
     //removing the customer orders from the table
     if(found){
-        std::vector<OrderPair>::iterator orderIt=orderList.begin();
-        while(orderIt!=orderList.end()){
-            if((*orderIt).first==id)
-                orderList.erase(orderIt);
+        int j=0;
+        std::vector<OrderPair> tmpOrderList;
+        for(auto order:orderList) {
+            if (order.first != id)
+                tmpOrderList.push_back(order);
         }
-    }*/
+        orderList.clear();
+        for(auto order:tmpOrderList)
+            orderList.push_back(order);
+    }
 }
 
 Customer* Table::getCustomer(int id) {  //if the id is not in the table return nullptr.
     Customer* output= nullptr;
     bool found=false;
-    for(int i=0;i<customersList.size(), !found;i++) {
+    int size=((int)this->customersList.size());
+    for(int i=0;i<size, !found;i++) {
         if (customersList[i]->getId() == id) {
             output = customersList[i];
             found = true;
         }
     }
-    return output;
+    if(found)
+        return output;
+    return nullptr;
 }
 
 std::vector<Customer*>& Table::getCustomers(){return customersList;}
@@ -59,13 +68,13 @@ void Table::openTable(){open=true;}
 bool Table::isOpen(){return open;}
 
 void Table::order(const std::vector<Dish> &menu){
-    std::vector<Customer*>::iterator it=customersList.begin();
-    std::vector<int> itCustomerOrders;
-    while(it!=customersList.end()) {
-        itCustomerOrders = (*it)->order(menu);
-        for (int i = 0; i < itCustomerOrders.size(); i++) {
-            orderList.push_back(OrderPair((*it)->getId(), menu[itCustomerOrders[i]]));
-            std::cout<<(*it)->getName()<<" ordered " << menu[itCustomerOrders[i]].getName()<< std::endl;
+
+    std::vector<int> customerOrders;
+    for(auto customer:customersList) {
+        customerOrders = customer->order(menu);
+        for (auto order:customerOrders) {
+            orderList.push_back(OrderPair(customer->getId(), menu[order]));
+            std::cout<<customer->getName()<<" ordered " << menu[order].getName()<< std::endl;
         }
     }
 }
@@ -74,58 +83,84 @@ void Table::closeTable(){open= false;}
 
 int Table::getBill(){
     int output=0;
-    for(int i=0;i<orderList.size();i++)
+    int size=((int)this->orderList.size());
+    for(int i=0;i<size;i++)
         output+=orderList[i].second.getPrice();
     return output;
 }
 
 //Destructor
 Table:: ~Table(){
-    // std::vector<Customers*>::iterator it=customersList.begin();
-    for(int i=0;i<customersList.size();i++)                   //There is no need to delete a vector of objects
+    int size=((int)this->customersList.size());
+    for(int i=0;i<size;i++)                   //There is no need to delete a vector of objects
         delete customersList[i];                                // In case of pointers we have to delete each pointer
     customersList.clear();                                     //After deleting each pointer we need to delete the vector itself
 }
 
 //CopyConstructor
-Table::Table(const Table& table):capacity(table.getCapacity()),orderList(table.orderList),open(table.open){
-    for(int i=0;i<table.customersList.size();i++)
-        this->customersList[i]=table.customersList[i];
+Table::Table(Table& other):capacity(other.getCapacity()),orderList(other.orderList),open(other.open){
+    int size=((int)other.customersList.size());
+    for(int i=0;i<size;i++)
+        this->customersList.push_back(other.customersList[i]->clone());
+    int size1=((int)other.orderList.size());
+    for (int i = 0; i < size1; i++)
+        this->orderList.push_back(other.orderList[i]);
 
 }
 //copy assignment operator
 Table& Table::operator=(const Table& other) {
     if(this==&other)
         return *this;
-   // delete this;        //MOST CHECK HOW EXACTLY SHOULD WE DELETE 'THIS' BEFORE ASSIGN OTHER INTO IT
     this->capacity = other.getCapacity();
-    open = other.open;                        //Deleted the 'this' before open
-    for (int i = 0; i < other.orderList.size(); i++)
+    this->open = other.open;
+    int size=((int)this->customersList.size());
+    for (int i = 0; i < size; i++) {
+        delete(this->customersList[i]);
+        this->customersList[i]= nullptr;
+    }
+    this->orderList.clear();
+    int size1=((int)other.orderList.size());
+    for (int i = 0; i < size1; i++)
         this->orderList.push_back(other.orderList[i]);
-    for (int i = 0; i < other.customersList.size(); i++)
+    int size2=((int)other.customersList.size());
+    for (int i = 0; i < size2; i++)
         this->customersList.push_back(other.customersList[i]);
 }
 //MoveConstructor
-Table::Table(Table&& other){
-    steal(other);
-
-}
-
-void Table::steal(Table& other) {
-    this->open=other.isOpen();
-    this->capacity=other.getCapacity();
-    for (int i = 0; i < other.orderList.size(); i++) {
+Table::Table(Table&& other):open(other.isOpen()),capacity(other.getCapacity()){
+    int size=((int)other.orderList.size());
+    for (int i = 0; i < size; i++)
         this->orderList.push_back(other.orderList[i]);
-
-    }
-    for (int i = 0; i < other.customersList.size(); i++) {
+    int size1=((int)other.customersList.size());
+    for (int i = 0; i <size1; i++) {
         this->customersList.push_back(other.customersList[i]);
+        other.customersList[i]= nullptr;
     }
-
+    other.customersList.clear();
+    other.orderList.clear();
 }
 
-//MoveAssignmentOperator
+
 Table& Table::operator=(Table&& other){
-    steal(other);
+    if(this!=&other){
+        this->capacity=other.capacity;
+        this->open=other.open;
+        int size=((int)this->customersList.size());
+        for(int i=0;i<size;i++){
+            delete(this->customersList[i]);
+            this->customersList[i]= nullptr;
+        }
+        this->customersList.clear();
+        int size1=((int)other.customersList.size());
+        for(int i=0;i<size1;i++)
+            this->customersList.push_back(other.customersList[i]);
+        this->orderList.clear();
+        int size2=((int)other.orderList.size());
+        for(int i=0;i<size2;i++)
+            this->orderList.push_back(other.orderList[i]);
+        other.customersList.clear();
+        other.orderList.clear();
+
+    }
     return *this;
 }

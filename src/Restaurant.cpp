@@ -16,7 +16,8 @@
 
 
 
-Restaurant::Restaurant():open(false),customerCount(0) {}
+Restaurant::Restaurant():open(false),customerCount(0)  {}
+
 
 Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerCount(0){
     std::ifstream sourceFile(configFilePath);
@@ -32,16 +33,16 @@ Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerC
     while (std::getline(sourceFile,nextLn)){
         if(firstStage){
 
-                while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
-                    std::getline(sourceFile,nextLn);
-                int tempInt=std::stoi(nextLn, nullptr,10);
-
+            while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
                 std::getline(sourceFile,nextLn);
-                while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
-                    std::getline(sourceFile,nextLn);
-                initTable(tempInt,nextLn);
+            int tempInt=std::stoi(nextLn, nullptr,10);
 
-                firstStage=false;
+            std::getline(sourceFile,nextLn);
+            while(nextLn.at(0)=='#' || nextLn=="" || nextLn=="\r")
+                std::getline(sourceFile,nextLn);
+            initTable(tempInt,nextLn);
+
+            firstStage=false;
 
         }
         else{
@@ -52,7 +53,6 @@ Restaurant::Restaurant(const std::string &configFilePath) :open(false),customerC
             std::getline(ss,dishName,',');
             std::getline(ss,dishType,',');
             std::getline(ss,dishPrice,',');
-            std::cout << nextLn << std::endl;
             if(dishType=="VEG")
                 menu.push_back(Dish(dishId,dishName,std::stoi(dishPrice, nullptr,10),VEG));
             else if(dishType=="ALC")
@@ -75,37 +75,63 @@ void Restaurant::start() {
     std::string word;
 
     while(open){
-        std::cin >> input;
+        getline(std::cin,input);
         std::stringstream ss(input);
         std::getline(ss,word,' ');
         if(word=="open"){
-                openTable(input.substr(5));
+            openTable(input.substr(5));
         }
         else if(word=="order"){
-
+            std::getline(ss,word,' ');
+            int tableId=std::stoi(word);
+            actionsLog.push_back(new Order(tableId));
+            actionsLog.back()->act(*this);
         }
         else if(word=="move"){
-
+            std::getline(ss,word,' ');
+            int strt=std::stoi(word);
+            std::getline(ss,word,' ');
+            int dst=std::stoi(word);
+            std::getline(ss,word,' ');
+            int id=std::stoi(word);
+            actionsLog.push_back(new MoveCustomer(strt,dst,id));
+            actionsLog.back()->act(*this);
         }
         else if(word=="close"){
-
+            std::getline(ss,word,' ');
+            int tableId=std::stoi(word);
+            actionsLog.push_back(new Close(tableId));
+            actionsLog.back()->act(*this);
         }
         else if(word=="closeall"){
-
+            actionsLog.push_back(new CloseAll());
+            actionsLog.back()->act(*this);
         }
         else if(word=="menu"){
-
+            actionsLog.push_back(new PrintMenu());
+            actionsLog.back()->act(*this);
         }
         else if(word=="status"){
-
+            std::getline(ss,word,' ');
+            int tbl=std::stoi(word);
+            if(tbl>=0,tbl<tables.size()){
+                actionsLog.push_back( new PrintTableStatus(tbl));
+                actionsLog.back()->act(*this);
+            }
         }
         else if(word=="log"){
-
+            BaseAction* action= new PrintActionsLog();
+            action->act(*this);
+            actionsLog.push_back(action);
+            action= 0;
         }
         else if(word=="backup"){
-
+            actionsLog.push_back( new BackupRestaurant());
+            actionsLog.back()->act(*this);
         }
         else if(word=="restore"){
+            actionsLog.push_back( new RestoreResturant());
+            actionsLog.back()->act(*this);
 
         }
 
@@ -120,30 +146,27 @@ void Restaurant::openTable(std::string str){
 
     std::getline(ss,cstmrName,' ');
     int tableId=std::stoi(cstmrName,nullptr,10);
-    if(tableId>=0,tableId<tables.size(),!(tables[tableId]->isOpen())) {
+    std::string cstmrType;
+    while (std::getline(ss, cstmrName, ',')) {
+        std::getline(ss, cstmrType, ' ');
+        if (cstmrType == "veg")
+            customers.push_back(new VegetarianCustomer(cstmrName, customerCount));
+        else if (cstmrType == "chp")
+            customers.push_back(new CheapCustomer(cstmrName, customerCount));
+        else if (cstmrType == "spc")
+            customers.push_back(new SpicyCustomer(cstmrName, customerCount));
+        else if (cstmrType == "alc")
+            customers.push_back(new AlchoholicCustomer(cstmrName, customerCount));
+        customerCount++;
+    }
+    actionsLog.push_back(new OpenTable(tableId, customers));
+    actionsLog.back()->act(*this);
 
-        std::string cstmrType;
-        while (std::getline(ss, cstmrName, ',')) {
-            std::getline(ss, cstmrType, ' ');
-            if (cstmrType == "veg")
-                customers.push_back(new VegetarianCustomer(cstmrName, customerCount));
-            else if (cstmrType == "chp")
-                customers.push_back(new CheapCustomer(cstmrName, customerCount));
-            else if (cstmrType == "spc")
-                customers.push_back(new SpicyCustomer(cstmrName, customerCount));
-            else if (cstmrType == "alc")
-                customers.push_back(new AlchoholicCustomer(cstmrName, customerCount));
-            customerCount++;
-        }
-        BaseAction *action = new OpenTable(tableId, customers);
-        (*action).act(*this);
-        actionsLog.push_back(action);
-    }
-    else{
-        std:: cout <<"Table does not exist or is already open" <<std::endl;
-    }
+
 
 }
+
+
 
 void Restaurant::initTable(int numOfTables,std::string str){
     std::string tempStr;
@@ -159,17 +182,102 @@ int Restaurant::getNumOfTables() const {
 }
 
 Table *Restaurant::getTable(int ind) {
-    return tables[ind-1];
+    if(ind>=0,ind<tables.size())
+        return tables[ind];
+    return nullptr;
 
 }
 
-const std::vector<BaseAction *> &Restaurant::getActionsLog() const {
-    return actionsLog;
+const std::vector<BaseAction*> &Restaurant::getActionsLog() const {
+    return actionsLog ;
 }
 
 std::vector<Dish> &Restaurant::getMenu() {
     return menu;
 }
+//MoveAssignmentOperator
+Restaurant& Restaurant::operator=(Restaurant&& other) {
+    if(this==&other)
+        return *this;
+    this->open = other.open;
+    this->customerCount = other.customerCount;
+    this->menu.clear();
+    for(auto dish:other.menu)
+        this->menu.push_back(Dish(dish.getId(), dish.getName(), dish.getPrice(), dish.getType()));
+
+
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+    tables.clear();
+
+    for(auto table:other.tables) {
+        this->tables.push_back(new Table(*table));
+        delete(table);
+        table= nullptr;
+    }
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+    actionsLog.clear();
+
+    for(auto action:other.actionsLog) {
+        this->actionsLog.push_back(action->clone());
+        delete(action);
+        action= nullptr;
+    }
+
+    return *this;
 
 
 
+}
+// Copy operator
+Restaurant &Restaurant::operator=(const Restaurant &other) {
+    if(this==&other)
+        return *this;
+    this->open = other.open;
+    this->customerCount = other.customerCount;
+    this->menu.clear();
+    for(auto dish:other.menu)
+        this->menu.push_back(Dish(dish.getId(),dish.getName(),dish.getPrice(),dish.getType()));
+
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+    tables.clear();
+
+    for(auto table:other.tables)
+        this->tables.push_back(new Table(*table));
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+    actionsLog.clear();
+
+    for(auto action:other.actionsLog)
+        this->actionsLog.push_back(action->clone());
+
+}
+
+Restaurant::Restaurant(const Restaurant &restaurant) {
+
+}
+
+Restaurant::~Restaurant() {
+    for(auto table:tables){
+        delete(table);
+        table= nullptr;
+    }
+
+    for(auto action:actionsLog){
+        delete(action);
+        action= nullptr;
+    }
+
+}

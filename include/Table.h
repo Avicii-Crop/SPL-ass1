@@ -26,10 +26,9 @@ public:
     int getBill();
     bool isOpen();
     virtual ~Table();
-    Table(const Table& table);
+    Table(Table& table);
     Table& operator=(const Table& other);
     Table(Table&& other);
-    void steal(Table& other);
     Table& operator=(Table&& other);
 private:
     int capacity;

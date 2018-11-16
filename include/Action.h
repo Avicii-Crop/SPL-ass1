@@ -1,13 +1,15 @@
 //
-// Created by achikamor on 13/11/18.
+// Created by vaismav@wincs.cs.bgu.ac.il on 11/16/18.
 //
 
 #ifndef SPL_ASS1_ACTION_H
 #define SPL_ASS1_ACTION_H
-
 #include <string>
 #include <iostream>
 #include "../include/Customer.h"
+
+
+
 
 enum ActionStatus{
     PENDING, COMPLETED, ERROR
@@ -15,6 +17,7 @@ enum ActionStatus{
 
 //Forward declaration
 class Restaurant;
+extern Restaurant* backup;
 
 class BaseAction{
 public:
@@ -22,6 +25,7 @@ public:
     ActionStatus getStatus() const;
     virtual void act(Restaurant& restaurant)=0;
     virtual std::string toString() const=0;
+    virtual BaseAction* clone()=0;
 protected:
     void complete();
     void error(std::string errorMsg);
@@ -37,9 +41,10 @@ public:
     OpenTable(int id, std::vector<Customer *> &customersList);
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
     const int tableId;
-    const std::vector<Customer *> customers;
+    std::vector<Customer *> customers;
 };
 
 
@@ -48,6 +53,7 @@ public:
     Order(int id);
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
     const int tableId;
 };
@@ -58,6 +64,7 @@ public:
     MoveCustomer(int src, int dst, int customerId);
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
     const int srcTable;
     const int dstTable;
@@ -70,6 +77,7 @@ public:
     Close(int id);
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
     const int tableId;
 };
@@ -80,6 +88,7 @@ public:
     CloseAll();
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
 };
 
@@ -89,6 +98,7 @@ public:
     PrintMenu();
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
 };
 
@@ -98,6 +108,7 @@ public:
     PrintTableStatus(int id);
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
     const int tableId;
 };
@@ -108,6 +119,7 @@ public:
     PrintActionsLog();
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
 };
 
@@ -117,6 +129,7 @@ public:
     BackupRestaurant();
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 private:
 };
 
@@ -126,9 +139,9 @@ public:
     RestoreResturant();
     void act(Restaurant &restaurant);
     std::string toString() const;
+    BaseAction* clone();
 
 };
 
 
-#endif
-
+#endif //SPL_ASS1_ACTION_H

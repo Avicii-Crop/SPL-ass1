@@ -18,6 +18,7 @@ public:
     std::string getName() const;
     int getPrice() const;
     DishType getType() const;
+    std::string tostring();
 private:
     const int id;
     const std::string name;
